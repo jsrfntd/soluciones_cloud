@@ -1,0 +1,123 @@
+{% extends 'usuario/base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}Video Contest Manager Login{% endblock %}
+
+{% block contenido  %}
+    <div >
+        <div class="contenidoLogin">
+            <div >
+                {% if messages %}
+                    <div>
+                        {% for message in messages %}
+                            <div class="{{message.tags}} alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <p id="mensaje">{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if not user.is_authenticated %}
+                    <div class="inicio">
+                        <img src="{% static 'img/2.png' %}" alt="Logo tus eventos"/>
+                    </div>
+                    <br>
+                    <div>
+                    <h1  style="text-align: center;" > El administrador de consursos de videos número 1 del mundo</h1>
+                        <br>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{% static 'img/l2.png' %}" height="150" alt="Logo tus eventos"/>
+                            <h2>
+                                Registrate
+                            </h2>
+                            <p>
+                                Llena el formulario de inscripción con tus datos personales.
+                            </p>
+
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{% static 'img/l1.png' %}" height="150" alt="Logo tus eventos"/>
+                            <h2>
+                                Crea un concurso
+                            </h2>
+                            <p class="text-align: center">
+                                Entra con tu usuario y en tu banner podras crear un concurso, llena el formulario y crea tu concurso.
+                                Recuerda que es obligatorio tener una imagen para tu concurso.
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="{% static 'img/l3.png' %}" height="150" alt="Logo tus eventos"/>
+                            <h2>
+                                Gestiona tus concurso
+                            </h2>
+                            <p>
+                                En tu banner podran monitorear las subidas de videos de tus concursos, tambien puedes cambiar cualquier
+                                caracteristica de tus concursos. Visualiza los videos que se han subido en su formato original y convertido.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="formulario">
+                        <div class="centered" id ="sesionBotones">
+                            <form class="bs-example bs-example-form" action="{% url 'vcm:login' %}" method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form form %}
+                                <br/>
+                                <div class="row">
+                                    <div class="centered">
+                                        <button class="btn btn-success" id="boton_add"> Iniciar Sesión </button>
+                                        <button type="button" class="btn btn-success" onclick="cambioModo()">Registrarse</button>
+                                    </div>
+                                    <br/>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="centered" id ="registroBotones" style="display: none;">
+                            <form class="bs-example bs-example-form" action="{% url 'vcm:usuario_create' %}" method="post">
+                                {% csrf_token %}
+                                {% bootstrap_form formRegistro %}
+                                <br/>
+                                <div class="row">
+                                    <div class="centered">
+                                        <button type="button" class="btn btn-success" onclick="cambioModo()" >Inicia Sesión</button>
+                                        <button  type="submit" class="btn btn-success" >Registrate</button>
+
+                                    </div>
+                                    <br/>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+        function cambioModo() {
+            var z = document.getElementById("registroBotones");
+            var w = document.getElementById("sesionBotones");
+            if (z.style.display === "none") {
+                z.style.display = "block";
+                w.style.display = "none";
+            } else {
+                z.style.display = "none";
+                w.style.display = "block";
+            }
+        }
+    </script>
+    {% if registro %}
+        <script>
+            cambioModo()
+        </script>
+    {% endif %}
+{% endblock %}

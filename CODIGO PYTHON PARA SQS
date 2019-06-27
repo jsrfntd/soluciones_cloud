@@ -1,0 +1,42 @@
+#LEER MENSAJES DE LA COLA
+
+import boto3
+
+region_name = 'us-east-1'
+queue_name = 'videoQ'
+
+aws_access_key_id = 'aqui el id de la cola' # Se debe enviar a las varaibles de entorno
+aws_secret_access_key = 'aqui va la llave de la cola' #Enviar a variables de entorno
+sqs = boto3.resource('sqs', region_name=region_name,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key)
+queue = sqs.get_queue_by_name(QueueName=queue_name)
+
+#LEER MENSAJES
+max_queue_messages = 10
+message_bodies = []
+messages_to_delete = []
+
+response = queue.receive_messages(MaxNumberOfMessages=max_queue_messages)
+message = response[0]
+body=message.body
+print(body)
+
+# BORRAR MENSAJES DE LA COLA
+messages_to_delete.append({
+            'Id': message.message_id,
+            'ReceiptHandle': message.receipt_handle
+        })
+delete_response = queue.delete_messages(
+                Entries=messages_to_delete)
+
+
+# ESCRIBIR MENSAJES
+
+
+response = client.send_message(
+    QueueUrl='https://sqs.us-east-1.amazonaws.com/874866528123/videoQ',
+    MessageBody='URL_DEL_VIDEO_ORIGINAL',
+    DelaySeconds=0,
+ 
+)

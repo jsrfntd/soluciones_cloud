@@ -1,0 +1,7 @@
+Para activar la aplicacion de autosacllin para el worker:
+heroku ps:scale clock=1
+
+Esta aplicacion scala los dynos del worker segun la cantidad de mensajes en cola
+
+Para activar un worker manualmente:
+heroku ps:scale worker=1

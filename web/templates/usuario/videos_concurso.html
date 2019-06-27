@@ -1,0 +1,147 @@
+
+{% extends 'usuario/base.html' %}
+{% load static %}
+
+{% block title %}Video Contest Manager{% endblock %}
+
+{% block extra_head %}
+    <link href="https://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
+    <script src="https://vjs.zencdn.net/7.1.0/video.js"></script>
+{% endblock %}
+
+{% block contenido  %}
+    <div class="contenido">
+    <h1>Videos participantes del concurso <strong> {{ concurso.nombre }} </strong></h1>
+    <img height="200px" src="{{ MEDIA_URL }}{{ concurso.imagen}}" alt="logo concurso">
+    <br/>
+    <hr/>
+    <div >
+        {% if  user.is_authenticated %}
+            <div class="card-columns">
+                {% for video in videos %}
+
+                    <div class="card">
+                        <video
+                                id="{{ video.video_original }}"
+                                class="card-img-top video-js"
+                                controls
+                                preload="auto"
+                                poster="{% static 'img/2.png' %}"
+                                style="display: block;"
+                                data-setup='{}'>
+                            <source src="{{ MEDIA_URL }}{{ video.video_original }}" >
+                            <p class="vjs-no-js">
+                                To view this video please enable JavaScript, and consider upgrading to a
+                                web browser that
+                                <a href="http://videojs.com/html5-video-support/" target="_blank">
+                                    supports HTML5 video
+                                </a>
+                            </p>
+                        </video>
+                        {% if video.video_porcesado %}
+                            <div id="{{ video.video_original }}-c" style="display: none;">
+                                <video
+                                        id="{{ video.video_original }}2"
+                                        class="card-img-top video-js"
+                                        controls
+                                        preload="auto"
+                                        poster="{% static 'img/2.png' %}"
+                                        data-setup='{}'>
+                                    <source src="{{ MEDIA_URL }}{{ video.video_porcesado }}">
+                                    <p class="vjs-no-js">
+                                        To view this video please enable JavaScript, and consider upgrading to a
+                                        web browser that
+                                        <a href="http://videojs.com/html5-video-support/" target="_blank">
+                                            supports HTML5 video
+                                        </a>
+                                    </p>
+                                </video>
+                            </div>
+
+                        {% endif  %}
+                        <div class="card-body">
+                            <h5 class="card-title"> Por {{ video.nombres_participante }} {{ video.apellidos_participante }}</h5>
+                            <p class="card-text">
+                            <h4>{{ video.descripcion }}</h4>
+                            <p>Correo electrónico: {{ video.correo_participante }} </p>
+                            </p>
+                            {% if video.video_porcesado %}
+                                <button  id="{{ video.video_original }}-b" onclick="cambiar('{{ video.video_original }}')" class="btn btn-primary">Ver video procesado </button>
+                            {% endif  %}
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">Fecha de inscripción {{ video.fecha_inscripcion.date.isoformat }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div aria-label="Paginacion">
+        {% if videos.has_other_pages %}
+            <ul class="pagination pagination-lg justify-content-center">
+                {% if videos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ videos.previous_page_number }}">Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link">Anterior</a></li>
+                {% endif %}
+
+                {% if videos.paginator.num_pages <= 9 %}
+
+                    {% for i in videos.paginator.page_range %}
+                        {% if videos.number == i %}
+                            <li class="page-item active"><a class="page-link" >{{ i }} <span class="sr-only">(current)</span></a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                {% else %}
+
+                    {% for i in videos.paginator.page_range %}
+                        {% if videos.number == i %}
+                            <li class="page-item active"><a class="page-link" >{{ i }} <span class="sr-only">(current)</span></a></li>
+
+                        {% elif  i > videos.number|add:'-4' and i < videos.number|add:'4' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                {% endif %}
+
+                {% if videos.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ videos.next_page_number }}">Siguiente</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link">Siguiente</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+        function cambiar(id){
+            var x = document.getElementById(id).getAttribute("style")
+            if(x === "display: block;"){
+                document.getElementById(id).style.display = "none";
+                document.getElementById(id+"-c").style.display = "block";
+                document.getElementById(id+"-b").innerText = "Ver video original";
+
+            }else{
+                document.getElementById(id).style.display = "block";
+                document.getElementById(id+"-c").style.display = "none";
+                document.getElementById(id+"-b").innerText = "Ver video procesado";
+            }
+        }
+
+    </script>
+
+
+
+{% endblock %}

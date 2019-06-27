@@ -1,0 +1,42 @@
+Pasos para desplegar aplicacion en Heroku.
+
+#Crear archivo en la raiz del proyecto : Procfile y agregar la sigueinte linea:
+web: gunicorn myproject.wsgi
+
+#Crear el archivo en la raiz del proyecto: runtime y agregar la version de python:
+python-3.7.0
+
+#Instalar gunicorn
+pip install gunicorn
+
+#Instalar django_heroku
+pip install django_heroku
+
+#Generar en la raiz del proyecto el archivo de dependias a instalar en el ambiente.
+pip freeze > requirements.txt
+
+#Importar  Django Heroku en Settings.py
+import django_heroku
+
+#Agregar al final de Settings.py
+django_heroku.settings(locals())
+
+#Entrar a la carpeta del proyecto y ejecutar los sigueintes comandos:
+#Hacer login desde el cliente a Keroku (Ingresar usuario y contraseña).
+heroku login
+
+#Iniciar el repositorio
+git init
+
+#Crear la aplicacion en Heroku
+heroku apps:create appvideoscontest --buildpack heroku/python
+
+#Push de la aplicacion
+git add .
+git commit -am "Despliegue Heroku"
+
+#Push y despliegue de la aplicacion en Heroku
+git push heroku master
+
+
+

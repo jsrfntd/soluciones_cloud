@@ -1,0 +1,159 @@
+{% extends 'participante/base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}Videos concurso{% endblock %}
+{% block extra_head %}
+    <link href="https://vjs.zencdn.net/7.1.0/video-js.css" rel="stylesheet">
+    <script src="https://vjs.zencdn.net/7.1.0/video.js"></script>
+{% endblock %}
+
+{% block contenido  %}
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <div class="{{message.tags}} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <p id="mensaje">{{ message }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div class="modal fade" id="formularioModal" tabindex="-1" role="dialog" aria-labelledby="formularioModalLabel" >
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="formularioModalLabel">Participa</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="formulario">
+                        <form class="bs-example bs-example-form col-md-8" action="{% url 'vcm:participar' concurso.url %}"
+                              method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            <br/>
+                            <div class="row">
+                                <div class="centered">
+                                    <button class="btn btn-success" id="boton_add"> Enviar</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                </div>
+                                <br/>
+                            </div>
+                        </form>
+                        <br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="background-color: #003366;">
+        <br/>
+        <br/>
+        <h1 style="color: white">Participa con tu video en el concurso {{ concurso.nombre }}</h1>
+        <br/>
+    </div>
+
+    <div class="contenido">
+        <img src="{{ MEDIA_URL }}{{ concurso.imagen}}" style="width:128px;height:128px;" alt="logo concurso">
+        <br/>
+        <br/>
+        <h2 style="color: green">Descripción</h2>
+        <h3>{{ concurso.descripcion }}</h3>
+        <hr>
+        <div>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#formularioModal">Participa
+            </button>
+        </div>
+        <br/>
+        <hr>
+        <h4 style="color: green"> Videos de los participantes</h4>
+        {% if numbervideos > 0 %}
+            <div class="card-columns">
+                {% for video in videos %}
+                    <div class="card">
+                        <video
+                                id="{{ video.video_original }}"
+                                class="card-img-top video-js"
+                                controls
+                                preload="auto"
+                                poster="{% static 'img/2.png' %}"
+                                data-setup='{}'>
+                            <source src="{{ MEDIA_URL }}{{ video.video_porcesado }}">
+                            <p class="vjs-no-js">
+                                To view this video please enable JavaScript, and consider upgrading to a
+                                web browser that
+                                <a href="http://videojs.com/html5-video-support/" target="_blank">
+                                    supports HTML5 video
+                                </a>
+                            </p>
+                        </video>
+                        <div class="card-body">
+                            <h5 class="card-title"> Por {{ video.nombres_participante }} {{ video.apellidos_participante }}</h5>
+                            <p class="card-text">
+                            <h4>{{ video.descripcion }}</h4>
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">Fecha de envío {{ video.fecha_inscripcion.date.isoformat }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h3>
+                No hay videos
+            </h3>
+        {% endif %}
+    </div>
+
+    <div aria-label="Paginacion">
+        {% if videos.has_other_pages %}
+            <ul class="pagination pagination-lg justify-content-center">
+                {% if videos.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ videos.previous_page_number }}">Anterior</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link">Anterior</a></li>
+                {% endif %}
+               {% if videos.paginator.num_pages <= 9 %}
+
+                    {% for i in videos.paginator.page_range %}
+                        {% if videos.number == i %}
+                            <li class="page-item active"><a class="page-link" >{{ i }} <span class="sr-only">(current)</span></a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                {% else %}
+
+                    {% for i in videos.paginator.page_range %}
+                        {% if videos.number == i %}
+                            <li class="page-item active"><a class="page-link" >{{ i }} <span class="sr-only">(current)</span></a></li>
+
+                        {% elif  i > videos.number|add:'-4' and i < videos.number|add:'4' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                {% endif %}
+                {% if videos.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ videos.next_page_number }}">Siguiente</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link">Siguiente</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+
+
+    </script>
+{% endblock %}

@@ -1,0 +1,34 @@
+#En el servidor
+sudo apt-get update
+sudo apt-get install nfs-kernel-server
+#En el cliente
+sudo apt-get update
+sudo apt-get install nfs-common
+#En el servidor
+#Compartir carpeta videosOriginales
+sudo mkdir /nfs/ubuntu/videosOriginales/ -p
+sudo chown nobody:nogroup /nfs/ubuntu/videosOriginales/
+#Compartir carpeta videosProcesados
+sudo mkdir /nfs/ubuntu/videosProcesados/ -p
+sudo chown nobody:nogroup /nfs/ubuntu/videosProcesados/
+#Editar el siguinte archivo para exportar las carpetas
+sudo vim /etc/exports
+#Ingresar las siguientes lineas para exportar los directorios del sistema de archivos locales
+/nfs/ubuntu/videosOriginales/                  172.31.88.7(rw,sync,no_subtree_check)
+/nfs/ubuntu/videosProcesados/                  172.31.88.7(rw,sync,no_subtree_check)
+/home                                          172.31.88.7(rw,sync,no_root_squash,no_subtree_check)
+#Reiniciar el servicio
+systemctl restart nfs-kernel-server
+#Verificar el estado del firewall
+sudo ufw status
+#Permitir el trafico por el puerto del servicio nfs desde el host remoto permitido
+sudo ufw allow from 172.31.88.7 to any port nfs
+#Verificar que la regla se aplico
+sudo ufw status
+#En el cliente
+sudo mkdir -p /nfs/home/ubuntu/web/media/videosOriginales
+sudo mkdir -p /nfs/home/ubuntu/web/media/videosProcesados
+sudo mkdir -p /nfs/home
+sudo mount 172.31.89.86:/nfs/ubuntu/videosOriginales /nfs/home/ubuntu/web/media/videosOriginales
+sudo mount 172.31.89.86:/nfs/ubuntu/videosProcesados /nfs/home/ubuntu/web/media/videosProcesados
+sudo mount 172.31.89.86:/nfs/home /home

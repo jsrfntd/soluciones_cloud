@@ -1,0 +1,104 @@
+#Migrar la base de datos desde heroku
+heroku run python manage.py migrate
+
+#Reiniciar la aplicacion
+heroku restart
+
+#Cache: Referencia: https://devcenter.heroku.com/articles/django-memcache
+#Agregar addons del cache. Se debe tener inscirta la targeta de credito
+heroku addons:create memcachier:dev
+
+//Verificar archivo de  configuracion de credenciales en drive.
+
+#Verificar el seteo de las variables de entorno.
+heroku config:get MEMCACHIER_SERVERS
+
+#Remover variables de entorno//Remover variable de entorno
+heroku config:unset MEMCACHIER_SERVERS
+
+#Mostrar todas las variables de entorno
+heroku config
+
+#Configurar cache en: django_tasklist/settings.py
+def get_cache():
+  import os
+  try:
+    servers = os.environ['MEMCACHIER_SERVERS']
+    username = os.environ['MEMCACHIER_USERNAME']
+    password = os.environ['MEMCACHIER_PASSWORD']
+    return {
+      'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        # TIMEOUT is not the connection timeout! It's the default expiration
+        # timeout that should be applied to keys! Setting it to `None`
+        # disables expiration.
+        'TIMEOUT': None,
+        'LOCATION': servers,
+        'OPTIONS': {
+          'binary': True,
+          'username': username,
+          'password': password,
+          'behaviors': {
+            # Enable faster IO
+            'no_block': True,
+            'tcp_nodelay': True,
+            # Keep connection alive
+            'tcp_keepalive': True,
+            # Timeout settings
+            'connect_timeout': 2000, # ms
+            'send_timeout': 750 * 1000, # us
+            'receive_timeout': 750 * 1000, # us
+            '_poll_timeout': 2000, # ms
+            # Better failover
+            'ketama': True,
+            'remove_failed': 1,
+            'retry_timeout': 2,
+            'dead_timeout': 30,
+          }
+        }
+      }
+    }
+  except:
+    return {
+      'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+      }
+    }
+
+CACHES = get_cache()
+
+#Agregar en requirements.txt la cual es la libreria mediante la cual se maneja el cache desde django:
+pylibmc==1.5.2
+
+#Verificar la configuracion del memcache:
+heroku run python manage.py shell
+>>> from django.core.cache import cache
+>>> cache.get("foo")
+>>> cache.set("foo", "bar")
+>>> cache.get("foo")
+'bar'
+
+#Esta configuracion es requerida en caso de que se tenga una base de datos configurada desde heroku directamente
+#Agregar plugin de mongolab (Solo para desarrollo)
+heroku addons:create mongolab
+
+#Agregar plugin de mongolab (Alta disponibilidad para produccion)
+heroku addons:create mongolab:shared-cluster-1
+
+#Enviar los cambios y desplegar la aplicacion.
+git add .
+git commit .
+git push heroku master
+
+#Verificar que la aplicacion este corriendo
+heroku ps
+
+
+
+
+
+
+
+
+
+

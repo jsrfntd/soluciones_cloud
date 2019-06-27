@@ -1,0 +1,127 @@
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+}
+
+nav {
+    background-color: rgb(204, 226, 231)!important;
+    font-family: 'Roboto Slab', serif;
+}
+div {
+    font-family: 'Roboto Slab', serif;
+}
+.navbar-default .navbar-nav>li>a {
+    color: black;
+}
+
+.navbar-default .navbar-nav>.active>a {
+    color: white;
+    background-color: #D7AE55;
+}
+.navbar-default .navbar-nav>.active>a,
+.navbar-default .navbar-nav>.active>a:focus,
+.navbar-default .navbar-nav>.active>a:hover{
+    color: white;
+    background-color: #31708f;
+}
+
+
+
+.dropdown-menu .divider {
+    background-color: #D7AE55;
+}
+
+.navbar-nav>li>.dropdown-menu{
+    color: #555;
+    background-color: #e7e7e7;
+}
+
+.navbar-nav .open .dropdown-menu{
+    background-color: #e7e7e7;
+}
+
+.contenido{
+    padding:75px 4% 0 4%;
+}
+.contenidoLogin{
+    padding:0 10% 0 10%;
+}
+
+/*inicio*/
+.inicio {
+    width: 100%;
+    height: 200px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.inicio > img{
+    max-height: 200px;
+    max-width: 100%;
+}
+
+
+.login-btn:hover{
+    color: #21a9af;
+    background-color: white;
+}
+
+img {
+    border-radius: 5px 5px 0 0;
+}
+
+.centered {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.btn-success {
+    color: #333333;
+    border-color: #8e9ba6;
+    background-color: #5989ff;
+    margin: 5px 5px 5px 5px;
+}
+
+
+.btn-danger2 {
+    color: #333333;
+    background-color: #ec3939;
+    border-color: #ff5c5c;
+}
+.btn-danger2:hover {
+    color: white;
+    border-color: #ff5c5c;
+}
+.btn-danger2:focus {
+    background-color: #ff5c5c!important;
+}
+.btn-danger2:active {
+    background-color: #ff5c5c!important;
+}
+
+.formulario {
+    box-shadow: 0 4px 8px 0 rgb(104, 123, 137);
+    transition: 0.3s;
+    padding-top: 1vw;
+    padding-bottom: 1vw;
+    border-radius: 5px; /* 5px rounded corners */
+    margin-bottom: 2vw;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background-color: rgb(204, 226, 231);
+}
+
+.formulario:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+
+.panel-default>.panel-heading {
+    background-color: rgb(204, 226, 231);
+    border-color: #000000;
+    border-radius: 10px;
+    padding: 15px;
+}

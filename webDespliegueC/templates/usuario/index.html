@@ -1,0 +1,197 @@
+
+{% extends 'usuario/base.html' %}
+{% load static %}
+
+{% block title %}Video Contest Manager{% endblock %}
+
+{% block contenido  %}
+    <div class="contenido">
+
+        <div >
+            {% if messages %}
+                <div>
+                    {% for message in messages %}
+                        <div class="{{message.tags}} alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <p id="mensaje">{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if  user.is_authenticated %}
+                <div class="modal fade" id="elminarModal" tabindex="-1" role="dialog" aria-labelledby="elminarModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="elminarModalLabel">Advertencia</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    Tenga en cuenta que eliminar un concurso es un proceso irreversible.
+                                    Escriba el nombre del consurso</p><p id="nombreEliminar"> </p> <p>
+                                para poder continuar.
+                            </p>
+
+                                <input onkeyup="deleteEnable()"  type="text" class="form-control" id="evento_name">
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post"  >
+                                    {% csrf_token %}
+                                    <input type="hidden" id="idE" name="idE" value="0"/>
+                                    <button  type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    <button id="eliminar_evento_modal" class="btn btn-danger2" type="submit"  disabled="true">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 >Todos tus Eventos</h3>
+                                    <h6> Selecciona un concurso</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <a class="btn btn-success" href="{% url 'vcm:concurso_create' %}">Agregar concurso </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                {% for concurso in concursos %}
+                                    <a onclick="mostrarDetalle('{{ concurso.nombre }}','{{ concurso.url }}','{{ concurso.fecha_inicio.date.isoformat }}','{{ concurso.fecha_terminacion.date.isoformat }}','{{ concurso.descripcion }}','{{ concurso.imagen}}','{{ concurso.id}}','{{ concurso.videos}}','{{ concurso.videos_convertidos}}');"
+                                       class="list-group-item list-group-item-action">
+                                        {{ concurso.nombre }}
+                                    </a>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h3 id="tituloDetalle" class="panel-title">Detalle</h3>
+                                </div>
+                                <div id="idOpciones" class="col-md-4" style="display: none;">
+                                    <a id="editarId" class="btn btn-success" >Editar</a>
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#elminarModal" >Elimiar</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="panel-body">
+                            <div id="imagenId" class="col-md-6" style="display: none;">
+                                <img id="imagenSrc" src="" alt="">
+                            </div>
+                            <br>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4>  <strong>Descripción</strong></h4>
+                                </div>
+                                <div class="col-md-9">
+                                    <p id="descripcionC" class="align-middle"> </p>
+                                </div>
+                            </div>
+                            <br>
+                            <hr>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4>  <strong>Fechas </strong></h4>
+                                </div>
+                                <div class="col-md-4">
+                                    <p id="inicioC" class="align-middle">Inicio: </p>
+
+                                </div>
+                                <div class="col-md-4">
+                                    <p id="terminacionC" class="align-middle">Terminación:  </p>
+                                </div>
+                            </div>
+                            <br>
+                            <hr>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4> <strong> Url de acceso </strong></h4>
+                                </div>
+                                <div class="col-md-2">
+                                    <p id="urlC" class="align-middle">Inicio: </p>
+                                </div>
+                                <div class="col-md-2">
+                                    <h4> <strong> Estado videos </strong></h4>
+                                </div>
+                                <div class="col-md-3">
+                                    <p id="videos" class="align-middle">Total Videos: </p>
+                                    <p id="convertidos" class="align-middle">Total Convertidos: </p>
+                                </div>
+                                <div id="verVideos" class="col-md-2" style="display: none;">
+                                    <a id="verVideosBt" class="btn btn-success" >Ver videos</a>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+
+        var concursoSeleccionado = {};
+        function mostrarDetalle(nombre,url,fecha_inicio,fecha_terminacion,descripcion,imagen,id, videos, convertidos) {
+            concursoSeleccionado = {"nombre":nombre , "id": id};
+
+            document.getElementById("tituloDetalle").innerHTML = "Detalle de  " + nombre;
+            document.getElementById("nombreEliminar").innerHTML = nombre;
+            document.getElementById("urlC").innerHTML = url;
+            document.getElementById("inicioC").innerHTML = "<strong> Inicio </strong> "+fecha_inicio;
+            document.getElementById("videos").innerHTML = "<strong> Total videos </strong> "+videos;
+            document.getElementById("convertidos").innerHTML = "<strong> Total convertidos </strong> "+convertidos;
+            document.getElementById("terminacionC").innerHTML = "<strong> Terminación </strong>: "+fecha_terminacion;
+            document.getElementById("descripcionC").innerHTML = descripcion;
+            document.getElementById("editarId").href = "/concurso_update/"+concursoSeleccionado.id;
+
+            document.getElementById("idOpciones").style.display = "block";
+            document.getElementById("imagenId").style.display = "block";
+            document.getElementById("imagenId").innerHTML = "<img  src=\" "  + "media/"+imagen+ "\" style=\"max-height: 500px; max-width: 750px;\"  alt=\"logo imagen\">";
+
+            if(videos > 0 ){
+                document.getElementById("verVideos").style.display = "block";
+                document.getElementById("verVideosBt").href = "/concurso_videos/"+concursoSeleccionado.id;
+            }
+
+
+
+        }
+
+        function deleteEnable() {
+            var name = $('#evento_name').val();
+            if(concursoSeleccionado.nombre===name.toString()){
+                $('#eliminar_evento_modal').removeClass("disabled");
+                $('#eliminar_evento_modal').prop('disabled', false);
+                $('#idE').prop('value', concursoSeleccionado.id);
+            }else{
+                $('#eliminar_evento_modal').addClass("disabled");
+                $('#eliminar_evento_modal').prop('disabled', true);
+                $('#idE').prop('value', 0);
+            }
+        }
+    </script>
+
+{% endblock %}

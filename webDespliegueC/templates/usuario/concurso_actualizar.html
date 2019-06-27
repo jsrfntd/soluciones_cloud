@@ -1,0 +1,30 @@
+{% extends 'usuario/base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}Edición Concurso{% endblock %}
+
+{% block contenido  %}
+    <div class="contenido">
+        <div class="centered"><h1>Editar Concurso</h1></div>
+        <div class="formulario">
+            <form class="bs-example bs-example-form col-md-8"  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <br/>
+                <div class="row">
+                    <div class="centered">
+                        <button class="btn btn-success" id="boton_add"> Guardar cambios </button>
+                        <a class="btn btn-danger" href="{% url 'vcm:index' %}" >Cancelar</a>
+                    </div>
+                    <br/>
+                </div>
+            </form>
+            <br/>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_script %}
+    <script>
+
+    </script>
+{% endblock %}
